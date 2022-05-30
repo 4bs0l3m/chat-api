@@ -10,7 +10,8 @@ export class Crud<T extends  BaseDto> {
     create(model:T){
         model.guid=UniqueGenerator.newGuid();
         
-        this.data.push(model);
+        this.data.push({...model});
+        return model.guid;
     }
     update(model:T){
         let intance = this.getByGuid(model.guid);//getbyguid
@@ -32,13 +33,25 @@ export class Crud<T extends  BaseDto> {
     delete(_guid:string){
         this.data=this.data.filter(x=>x.guid!=_guid);
     }
-    getAll(){
-        return this.data;
+    getByFilter(predicate:T){
+        let _preProps=Object.keys(predicate);
+        let _aggrData:T[]={...this.data};
+        _preProps.forEach(_prop=>{
+            if(_prop && typeof(_prop)=='string'){
+
+            }
+        })
+    }
+    fetch(){
+        console.log(this.data);
     }
     private data:T[];
 }
 function aa(){
     let ab=new Crud<Message>([]);
-    ab.create({})
+    let newMessage=ab.getByGuid(ab.create({}))
+    if(newMessage){
 
+    }
+    
 }
