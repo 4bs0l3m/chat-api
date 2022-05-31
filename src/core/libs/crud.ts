@@ -1,5 +1,4 @@
 import { BaseDto } from "../dtos/base-dto";
-import { Message } from "../dtos/message";
 import { UniqueGenerator } from "../utils/UniqueGenerator";
 
 export class Crud<T extends  BaseDto> {
@@ -15,8 +14,11 @@ export class Crud<T extends  BaseDto> {
     }
     update(model:T){
         let intance = this.getByGuid(model.guid);//getbyguid
+        
         if(intance!=null && intance!=undefined){ //has check?
             intance={...model};//clone
+            intance.modifiedDate=new Date();
+            return intance;
 
         }else{
             return null;
@@ -33,25 +35,11 @@ export class Crud<T extends  BaseDto> {
     delete(_guid:string){
         this.data=this.data.filter(x=>x.guid!=_guid);
     }
-    getByFilter(predicate:T){
-        let _preProps=Object.keys(predicate);
-        let _aggrData:T[]={...this.data};
-        _preProps.forEach(_prop=>{
-            if(_prop && typeof(_prop)=='string'){
-
-            }
-        })
+    findAll(predicate:(value: T, index: number, array: T[])=>any){
+        return {...this.data.filter(predicate)}
     }
-    fetch(){
-        console.log(this.data);
+    find(predicate:(value: T, index: number, array: T[])=>any){
+        return {...this.data.find(predicate)}
     }
     private data:T[];
-}
-function aa(){
-    let ab=new Crud<Message>([]);
-    let newMessage=ab.getByGuid(ab.create({}))
-    if(newMessage){
-
-    }
-    
 }
