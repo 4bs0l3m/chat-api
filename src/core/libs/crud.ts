@@ -1,45 +1,32 @@
 import { BaseDto } from "../dtos/base-dto";
+import { IRepository } from "../types/IRepository";
 import { UniqueGenerator } from "../utils/UniqueGenerator";
 
-export class Crud<T extends  BaseDto> {
-    constructor(_data:T[]){
-        
-        this.data=_data;
+export class Crud<T extends  BaseDto,R extends IRepository<T>>{
+    private repository:R;
+    constructor(_storeName:string,_repository:R){
+        this.repository=_repository;
+        //his.data=_data;
     }
     create(model:T){
         model.guid=UniqueGenerator.newGuid();
         
-        this.data.push({...model});
+        this.repository.add(model);
         return model.guid;
     }
     update(model:T){
-        let intance = this.getByGuid(model.guid);//getbyguid
-        
-        if(intance!=null && intance!=undefined){ //has check?
-            intance={...model};//clone
-            intance.modifiedDate=new Date();
-            return intance;
-
-        }else{
-            return null;
-        }
+        this.repository.update(model);
     }
-    getByGuid(_guid?:string){
-        if(_guid){
-
-            return this.data.find(x=>x.guid===_guid);
-        }else{
-            return null;
-        }
+    getByGuid(_guid:string){
+        return this.repository.getByGuid(_guid);
     }
     delete(_guid:string){
-        this.data=this.data.filter(x=>x.guid!=_guid);
+        this.repository.delete(_guid);
     }
     findAll(predicate:(value: T, index: number, array: T[])=>any){
-        return {...this.data.filter(predicate)}
+        return this.repository.findAll(predicate);
     }
     find(predicate:(value: T, index: number, array: T[])=>any){
-        return {...this.data.find(predicate)}
+        return this.repository.find(predicate);
     }
-    private data:T[];
 }
